@@ -1,0 +1,106 @@
+﻿using FaceRecognitive.Engine.Storage;
+using FaceRecognitive.Infoes.FaceInfo;
+using FaceRecognitive.Interfaces.FaceService;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace FaceRecognitive.Services.FaceService
+{
+    public class FaceService : IFaceService
+    {
+        private VirtualFaceDatabase virtualDB;
+
+        public FaceService()
+        {
+            virtualDB = new VirtualFaceDatabase();
+        }
+
+        public List<FaceInfo> CallFaces(string username)
+        {
+            List<FaceInfo> result = null;
+
+            if (username == "ALL_USERS")
+            {
+                result = virtualDB.Faces;
+            }
+            else
+            {
+                result = virtualDB.Faces.Where(x => x.Label == username).ToList();
+            }
+
+            return result;
+        }
+
+        public bool DeleteUser(string username)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int GenerateUserId()
+        {
+            var date = DateTime.Now.ToString("MMddHHmmss");
+            return Convert.ToInt32(date);
+        }
+
+        public List<string> GetAllUsernames()
+        {
+            throw new NotImplementedException();
+        }
+
+        public int GetUserId(string username)
+        {
+            int userId;
+            if (virtualDB.Faces.Any(x => x.Label == username))
+            {
+            }
+
+            return userId;
+        }
+
+        public string GetUsername(int userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsUsernameValid(string username)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string SaveAdmin(string username, string password)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string SaveFace(string username, byte[] faceBlob)
+        {
+            try
+            {
+                if (!virtualDB.Faces.Any(x => x.Label == username))
+                {
+                    var id = virtualDB.Faces.Count();
+                    var userId = GenerateUserId();
+
+                    var faceInfo = new FaceInfo
+                    {
+                        Id = id,
+                        Image = faceBlob,
+                        Label = username,
+                        UserId = userId
+                    };
+
+                    virtualDB.Faces.Add(faceInfo);
+                }
+
+                return String.Format("{0} face(s) saved successfully", username);
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+    }
+}
